@@ -427,8 +427,12 @@ const SecurityDashboard = () => {
                               Host: {scanResult.host.name} ({scanResult.host.department} dept) · Pass: {scanResult.passCode}
                             </div>
                           </div>
-                          <div style={{ marginLeft: 'auto', display: 'flex', gap: '7px' }}>
-                            <button onClick={() => window.open(`http://localhost:5000/api/passes/${scanResult.passCode}/pdf?token=${localStorage.getItem('vpms_token')}`)} className="bsm bpri" style={{ fontSize: '11px', padding: '6px 12px' }}>
+                            <button onClick={() => {
+                              const backendUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+                                ? 'http://localhost:5000'
+                                : 'https://visitor-app-69ei.onrender.com';
+                              window.open(`${backendUrl}/api/passes/${scanResult.passCode}/pdf?token=${localStorage.getItem('vpms_token')}`);
+                            }} className="bsm bpri" style={{ fontSize: '11px', padding: '6px 12px' }}>
                               <Printer size={12} /> Print Badge
                             </button>
                             <button onClick={() => setScanResult(null)} className="bsm bout" style={{ fontSize: '11px', padding: '6px 12px' }}>Dismiss</button>

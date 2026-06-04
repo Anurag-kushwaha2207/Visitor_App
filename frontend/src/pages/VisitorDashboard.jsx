@@ -126,8 +126,11 @@ const VisitorDashboard = () => {
 
   const handleDownloadPDF = () => {
     if (!pass) return;
+    const backendUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? 'http://localhost:5000'
+      : 'https://visitor-app-69ei.onrender.com';
     // Direct link to backend pdf endpoint with security token
-    window.open(`http://localhost:5000/api/passes/${pass._id}/pdf?token=${localStorage.getItem('vpms_token')}`);
+    window.open(`${backendUrl}/api/passes/${pass._id}/pdf?token=${localStorage.getItem('vpms_token')}`);
     showToast('Initiated PDF Badge Download');
   };
 

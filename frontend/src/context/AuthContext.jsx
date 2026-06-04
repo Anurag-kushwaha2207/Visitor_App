@@ -11,7 +11,9 @@ export const AuthProvider = ({ children }) => {
   const [toast, setToast] = useState({ message: '', type: '', active: false });
 
   // Base API configuration
-  const API_URL = 'http://localhost:5000/api';
+  const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:5000/api'
+    : 'https://visitor-app-69ei.onrender.com/api';
   axios.defaults.baseURL = API_URL;
 
   // Show premium custom toast
