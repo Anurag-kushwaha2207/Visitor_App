@@ -1,0 +1,10 @@
+{
+  "name": "vpms-root",
+  "version": "1.0.0",
+  "description": "Visitor Pass Management System Root",
+  "scripts": {
+    "seed": "node backend/seed.js",
+    "backend": "npm run dev --prefix backend",
+    "frontend": "npm run dev --prefix frontend"
+  }
+}
