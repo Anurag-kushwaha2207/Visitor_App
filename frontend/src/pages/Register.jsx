@@ -507,7 +507,7 @@ const Register = () => {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px' }}><div style={{ width: '20px', height: '20px', background: '#dcfce7', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#15803d', fontSize: '11px', flexShrink: 0 }}><Check size={10} /></div>Check-in alerts enabled</div>
                 </div>
                 
-                <button className="btn-login" style={{ maxWidth: '200px', margin: '0 auto' }} onClick={() => navigate(`/${formData.role}`)}>
+                <button className="btn-login" style={{ maxWidth: '200px', margin: '0 auto' }} onClick={() => navigate(`/${formData.role}`, { replace: true })}>
                   Go to Dashboard
                 </button>
               </div>

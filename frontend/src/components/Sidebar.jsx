@@ -63,7 +63,10 @@ const Sidebar = ({ activeTab, setActiveTab, onProfileClick, onNotificationsClick
               <FileSpreadsheet />
               <span>Export logs</span>
             </div>
-            
+            <div className={`sbl ${activeTab === 'settings' ? 'on' : ''}`} onClick={() => setActiveTab('settings')}>
+              <Settings />
+              <span>System Settings</span>
+            </div>
           </>
         );
 

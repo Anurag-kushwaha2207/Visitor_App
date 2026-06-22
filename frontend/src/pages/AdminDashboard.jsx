@@ -866,6 +866,119 @@ const AdminDashboard = () => {
                 </div>
               )}
 
+              {/* TAB 7: System Settings */}
+              {activeTab === 'settings' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  {/* General Configuration Card */}
+                  <div className="secc" style={{ padding: '20px' }}>
+                    <div style={{ fontSize: '14px', fontWeight: 600, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Settings size={18} style={{ color: '#7c3aed' }} /> General System Configuration
+                    </div>
+                    
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                      <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', background: 'var(--surface)', borderRadius: '8px', border: '1.5px solid var(--border)', cursor: 'pointer' }}>
+                        <div>
+                          <div style={{ fontSize: '13px', fontWeight: 600 }}>Require Host Pre-Approval</div>
+                          <div style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '2px' }}>Visitors must wait for employee host approval before QR pass generation.</div>
+                        </div>
+                        <input 
+                          type="checkbox" 
+                          checked={requirePreApproval} 
+                          onChange={(e) => {
+                            setRequirePreApproval(e.target.checked);
+                            showToast(`Host approval requirement ${e.target.checked ? 'enabled' : 'disabled'}`);
+                          }}
+                          style={{ width: '18px', height: '18px', accentColor: '#7c3aed' }}
+                        />
+                      </label>
+
+                      <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', background: 'var(--surface)', borderRadius: '8px', border: '1.5px solid var(--border)', cursor: 'pointer' }}>
+                        <div>
+                          <div style={{ fontSize: '13px', fontWeight: 600 }}>Auto-Verify Organization Domains</div>
+                          <div style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '2px' }}>Skip OTP verification for corporate employees using registered whitelist domains.</div>
+                        </div>
+                        <input 
+                          type="checkbox" 
+                          checked={autoVerifyDomains} 
+                          onChange={(e) => {
+                            setAutoVerifyDomains(e.target.checked);
+                            showToast(`Auto-verify domains ${e.target.checked ? 'enabled' : 'disabled'}`);
+                          }}
+                          style={{ width: '18px', height: '18px', accentColor: '#7c3aed' }}
+                        />
+                      </label>
+
+                      <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', background: 'var(--surface)', borderRadius: '8px', border: '1.5px solid var(--border)', cursor: 'pointer' }}>
+                        <div>
+                          <div style={{ fontSize: '13px', fontWeight: 600 }}>Auto-Generate PDF Passes</div>
+                          <div style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '2px' }}>Instantly compile PDF pass badges on server and attach to email alerts.</div>
+                        </div>
+                        <input 
+                          type="checkbox" 
+                          checked={autoGeneratePDF} 
+                          onChange={(e) => {
+                            setAutoGeneratePDF(e.target.checked);
+                            showToast(`PDF pass generation ${e.target.checked ? 'enabled' : 'disabled'}`);
+                          }}
+                          style={{ width: '18px', height: '18px', accentColor: '#7c3aed' }}
+                        />
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Danger Zone Card */}
+                  <div className="secc" style={{ padding: '20px', border: '1.5px solid #fee2e2', background: '#fff8f8' }}>
+                    <div style={{ fontSize: '14px', fontWeight: 600, color: '#991b1b', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <ShieldAlert size={18} style={{ color: '#ef4444' }} /> Danger Zone - Reset Database
+                    </div>
+                    <p style={{ fontSize: '12px', color: '#7f1d1d', lineHeight: '1.5', marginBottom: '16px' }}>
+                      Resetting the database will delete **all appointments, pass badges, visitor records, and scan history**. Only the 4 pre-configured system accounts (Admin, Security, Priya, and your Visitor account) will be preserved. This action is permanent and cannot be undone.
+                    </p>
+                    
+                    <button 
+                      type="button" 
+                      onClick={async () => {
+                        const confirm1 = window.confirm('Are you absolutely sure you want to RESET the database? This will wipe out all visitor data, appointments, passes, and check logs.');
+                        if (!confirm1) return;
+                        
+                        const confirm2 = window.confirm('WARNING: This action is completely irreversible. Please confirm once more that you want to delete everything and start fresh.');
+                        if (!confirm2) return;
+
+                        setLoading(true);
+                        try {
+                          const res = await axios.post('/admin/reset-database');
+                          if (res.data.success) {
+                            showToast('Database reset successfully! Kept only the 4 core accounts.');
+                            window.location.reload();
+                          }
+                        } catch (err) {
+                          showToast(err.response?.data?.message || 'Failed to reset database', 'error');
+                        } finally {
+                          setLoading(false);
+                        }
+                      }}
+                      className="bsm" 
+                      style={{ 
+                        background: '#dc2626', 
+                        color: '#fff', 
+                        border: 'none', 
+                        padding: '10px 16px', 
+                        borderRadius: '8px', 
+                        fontWeight: 600, 
+                        fontSize: '12px', 
+                        cursor: 'pointer',
+                        transition: 'background 0.2s',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      <ShieldAlert size={14} /> Clear System Data (Reset Database)
+                    </button>
+                  </div>
+                </div>
+              )}
+
 
 
             </>

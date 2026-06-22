@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Verify from './pages/Verify';
+import ForgotPassword from './pages/ForgotPassword';
 import AdminDashboard from './pages/AdminDashboard';
 import SecurityDashboard from './pages/SecurityDashboard';
 import EmployeeDashboard from './pages/EmployeeDashboard';
@@ -39,6 +40,28 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   return children;
 };
 
+// Custom component to restrict access to public-only routes (e.g. login, register)
+const PublicRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: 'var(--surface)' }}>
+        <div className="loading-spinner" />
+      </div>
+    );
+  }
+
+  if (user) {
+    if (!user.isVerified) {
+      return <Navigate to="/verify" replace />;
+    }
+    return <Navigate to={`/${user.role}`} replace />;
+  }
+
+  return children;
+};
+
 // Root index router redirect
 const RootRedirect = () => {
   const { user, loading } = useAuth();
@@ -68,9 +91,10 @@ function App() {
       <AuthProvider>
         <Routes>
           {/* Public Views */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+          <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
           <Route path="/verify" element={<Verify />} />
+          <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
 
           {/* Secure Role Dashboards */}
           <Route 

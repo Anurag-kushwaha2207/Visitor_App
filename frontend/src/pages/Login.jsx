@@ -53,7 +53,7 @@ const Login = () => {
 
     if (result.success) {
       // Navigate to correct dashboard based on role
-      navigate(`/${result.role}`);
+      navigate(`/${result.role}`, { replace: true });
     }
   };
 
@@ -79,7 +79,7 @@ const Login = () => {
               // Authenticate with backend
               const result = await googleLogin({ name, email, profilePhoto: picture });
               if (result.success) {
-                navigate(`/${result.role}`);
+                navigate(`/${result.role}`, { replace: true });
               }
             } catch (err) {
               showToast('Failed to fetch profile info from Google', 'error');
@@ -191,7 +191,7 @@ const Login = () => {
               <label style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '12px', color: 'var(--muted)', cursor: 'pointer' }}>
                 <input type="checkbox" style={{ accentColor: '#00c9a7', width: '13px', height: '13px' }} /> Remember me
               </label>
-              <a href="#" onClick={(e) => { e.preventDefault(); showToast('Password reset is mocked. Use demo bypass logins!', 'error'); }} style={{ fontSize: '12px', color: '#00a88b', textDecoration: 'none' }}>Forgot password?</a>
+              <Link to="/forgot-password" style={{ fontSize: '12px', color: '#00a88b', textDecoration: 'none' }}>Forgot password?</Link>
             </div>
             
             <button type="submit" className="btn-login" disabled={loading}>

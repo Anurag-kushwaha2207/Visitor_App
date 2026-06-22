@@ -251,3 +251,73 @@ exports.deleteUser = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// @desc    Reset database, keep only 4 core users
+// @route   POST /api/admin/reset-database
+// @access  Private (Admin only)
+exports.resetDatabase = async (req, res) => {
+  try {
+    // 1. Delete all check logs, passes, and appointments
+    await CheckLog.deleteMany({});
+    await Pass.deleteMany({});
+    await Appointment.deleteMany({});
+
+    // 2. Delete all users
+    await User.deleteMany({});
+
+    // 3. Create the 4 core users
+    const coreUsers = [
+      {
+        name: 'Suresh Agrawal',
+        email: 'admin@visitorpass.com',
+        password: 'password123',
+        phone: '+91 98765 00001',
+        role: 'admin',
+        organization: 'VPMS Corporate HQ',
+        department: 'Administration',
+        isVerified: true
+      },
+      {
+        name: 'Ravi Guard',
+        email: 'security@visitorpass.com',
+        password: 'password123',
+        phone: '+91 98765 00002',
+        role: 'security',
+        organization: 'VPMS Corporate HQ',
+        department: 'Security Desk',
+        isVerified: true
+      },
+      {
+        name: 'Priya Sharma',
+        email: 'priya@visitorpass.com',
+        password: 'password123',
+        phone: '+91 98765 00003',
+        role: 'employee',
+        organization: 'VPMS Corporate HQ',
+        department: 'IT',
+        isVerified: true
+      },
+      {
+        name: 'Rahul Kumar',
+        email: 'anuragkushwaha2207@gmail.com',
+        password: 'password123',
+        phone: '+91 98765 00006',
+        role: 'visitor',
+        organization: 'Apex Technical solutions',
+        department: '',
+        isVerified: true
+      }
+    ];
+
+    for (const u of coreUsers) {
+      await User.create(u);
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Database reset successfully. Kept only the 4 core accounts.'
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};

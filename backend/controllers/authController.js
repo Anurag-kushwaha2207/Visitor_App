@@ -321,3 +321,98 @@ exports.googleLogin = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// @desc    Forgot Password - Send OTP
+// @route   POST /api/auth/forgot-password
+// @access  Public
+exports.forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    // Generate 6 digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Set OTP fields on user document
+    user.otpCode = otp;
+    user.otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes expiry
+    await user.save();
+
+    console.log(`\n🔑 [PASSWORD RESET OTP] Generated for ${user.email}: ${otp}\n`);
+
+    const emailHtml = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; background: #ffffff;">
+        <div style="text-align: center; border-bottom: 2.5px solid #f43f5e; padding-bottom: 15px; margin-bottom: 20px;">
+          <h2 style="color: #0a1628; margin: 0; font-size: 22px;">VisitorPass Management</h2>
+        </div>
+        <p style="font-size: 14px; color: #1e293b; line-height: 1.5;">Dear <strong>${user.name}</strong>,</p>
+        <p style="font-size: 14px; color: #475569; line-height: 1.5;">We received a request to reset your password. Use the verification code below to proceed with setting a new password.</p>
+        
+        <div style="background: #f8fafc; border: 1.5px dashed #cbd5e1; border-radius: 8px; padding: 18px; text-align: center; margin: 25px 0;">
+          <div style="font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 8px;">Reset Verification Code</div>
+          <span style="font-size: 32px; font-weight: 800; letter-spacing: 5px; color: #0a1628;">${otp}</span>
+        </div>
+
+        <p style="font-size: 13px; color: #f43f5e; font-weight: 500;">Please note that this code is temporary and will expire in 10 minutes.</p>
+        <p style="font-size: 13px; color: #64748b; line-height: 1.5; margin-top: 15px;">If you did not request a password reset, please ignore this email or contact security administration.</p>
+        
+        <hr style="border: 0; border-top: 1px solid #e2e8f0; margin-top: 25px; margin-bottom: 15px;" />
+        <p style="font-size: 11px; color: #94a3b8; text-align: center; margin: 0;">This is an automated system email. Please do not reply directly.</p>
+      </div>
+    `;
+
+    try {
+      // Send real SMTP email
+      await sendEmail({
+        email: user.email,
+        subject: `[VisitorPass] Password Reset Verification Code: ${otp}`,
+        html: emailHtml
+      });
+    } catch (mailError) {
+      console.error('SMTP sending failed, but continuing for developer testing:', mailError.message);
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Password reset OTP has been sent to your email address'
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Reset Password using OTP
+// @route   POST /api/auth/reset-password
+// @access  Public
+exports.resetPassword = async (req, res) => {
+  try {
+    const { email, otp, newPassword } = req.body;
+
+    const user = await User.findOne({
+      email,
+      otpCode: otp,
+      otpExpires: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({ success: false, message: 'Invalid or expired OTP' });
+    }
+
+    // Set new password (will be hashed by userSchema.pre('save'))
+    user.password = newPassword;
+    user.otpCode = null;
+    user.otpExpires = null;
+    user.isVerified = true; // Auto-verify email if password reset was successful
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Password reset successful! You can now log in with your new password.'
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};

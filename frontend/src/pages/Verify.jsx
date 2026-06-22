@@ -13,6 +13,10 @@ const Verify = () => {
 
   useEffect(() => {
     if (user) {
+      if (user.isVerified) {
+        navigate(`/${user.role}`, { replace: true });
+        return;
+      }
       setEmail(user.email);
       // Automatically send OTP once on mount if user is logged in but not verified
       if (!user.isVerified && !otpSent) {
@@ -20,7 +24,7 @@ const Verify = () => {
         setOtpSent(true);
       }
     }
-  }, [user]);
+  }, [user, navigate]);
 
   const handleSendCode = async () => {
     if (!email) {
@@ -54,9 +58,9 @@ const Verify = () => {
       showToast('Your account has been verified successfully!');
       // Navigate to correct dashboard based on role
       if (user) {
-        navigate(`/${user.role}`);
+        navigate(`/${user.role}`, { replace: true });
       } else {
-        navigate('/login');
+        navigate('/login', { replace: true });
       }
     }
   };
