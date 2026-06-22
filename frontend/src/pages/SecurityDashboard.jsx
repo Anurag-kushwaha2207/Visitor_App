@@ -437,8 +437,8 @@ const SecurityDashboard = () => {
                             </button>
                             <button onClick={() => setScanResult(null)} className="bsm bout" style={{ fontSize: '11px', padding: '6px 12px' }}>Dismiss</button>
                           </div>
-                        </div>
-                      )}
+                        )
+                      }
                     </div>
                   )}
 
