@@ -5,7 +5,7 @@ const https = require('https');
  * @param {Object} options - Email options (email, subject, html)
  */
 const sendEmail = async (options) => {
-  const apiKey = process.env.RESEND_API_KEY || 're_9zQNdSfG_BYp2PszHErimBDASocjHy19G';
+  const apiKey = process.env.RESEND_API_KEY || 're_YwfEQT4L_BMQKf3y5s1iYrxQcH3ZztWKR';
 
   console.log(`\n===================================`);
   console.log(`[RESEND EMAIL SENDING] To: ${options.email}`);
