@@ -176,7 +176,7 @@ const Register = () => {
         
         {/* Header Block */}
         <div className="reg-head">
-          <h2>Create your account</h2>
+          <h1>Create your account</h1>
           <p>Takes just 2 minutes — your role is set during registration</p>
         </div>
 

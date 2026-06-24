@@ -117,7 +117,7 @@ const Login = () => {
             </div>
             
             <div className="ltag" style={{ marginTop: '28px' }}>
-              <h2>Secure. Smart.<br />Seamless Entry.</h2>
+              <h1>Secure. Smart.<br />Seamless Entry.</h1>
               <p>Digital visitor management — QR passes, real-time tracking, role-based access, instant notifications.</p>
             </div>
             
