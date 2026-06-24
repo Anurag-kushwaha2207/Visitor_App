@@ -4,7 +4,7 @@ import {
   ShieldCheck, UserCheck, Crown, Scan, Users, Contact, Calendar, 
   BarChart2, FileSpreadsheet, Building, Settings, LogOut, Printer, 
   AlertTriangle, Clock, History, FileText, Bell, UserPlus, HelpCircle,
-  FileCheck, ArrowLeft, ArrowRight
+  FileCheck
 } from 'lucide-react';
 
 const Sidebar = ({ activeTab, setActiveTab, onProfileClick, onNotificationsClick }) => {
@@ -190,34 +190,6 @@ const Sidebar = ({ activeTab, setActiveTab, onProfileClick, onNotificationsClick
     };
 
     const links = [];
-
-    // 1. Back Navigation Arrow
-    links.push(
-      <button 
-        key="back-nav"
-        onClick={() => window.history.back()}
-        className="mn-item"
-        style={{ color: 'var(--muted)' }}
-        title="Back"
-      >
-        <ArrowLeft size={18} />
-        <span className="mn-label">Back</span>
-      </button>
-    );
-
-    // 2. Next/Forward Navigation Arrow
-    links.push(
-      <button 
-        key="forward-nav"
-        onClick={() => window.history.forward()}
-        className="mn-item"
-        style={{ color: 'var(--muted)' }}
-        title="Forward"
-      >
-        <ArrowRight size={18} />
-        <span className="mn-label">Next</span>
-      </button>
-    );
 
     // 3. Primary Dashboard Home Button
     switch (user.role) {
