@@ -6,7 +6,7 @@ const https = require('https');
  */
 const sendEmail = async (options) => {
   const brevoKey = process.env.BREVO_API_KEY;
-  const resendKey = process.env.RESEND_API_KEY || 're_YwfEQT4L_BMQKf3y5s1iYrxQcH3ZztWKR';
+  const resendKey = process.env.RESEND_API_KEY;
 
   if (brevoKey) {
     // Send via Brevo HTTP API (Allows sending to ANY email without domain verification)
