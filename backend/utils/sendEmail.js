@@ -17,7 +17,10 @@ const sendEmail = async (options) => {
 
     return new Promise((resolve, reject) => {
       const data = JSON.stringify({
-        sender: { name: 'VisitorPass System', email: 'noreply@visitorpass.com' },
+        sender: { 
+          name: process.env.SMTP_FROM_NAME || 'VisitorPass System', 
+          email: process.env.SMTP_FROM || 'anuragkushwaha2207@gmail.com' 
+        },
         to: [{ email: options.email }],
         subject: options.subject,
         htmlContent: options.html
