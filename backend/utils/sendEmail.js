@@ -1,14 +1,71 @@
 const https = require('https');
 
 /**
- * Sends an email using Brevo (Sendinblue) or Resend API.
+ * Sends an email using EmailJS, Brevo, or Resend API.
  * @param {Object} options - Email options (email, subject, html)
  */
 const sendEmail = async (options) => {
+  const emailjsServiceId = process.env.EMAILJS_SERVICE_ID;
+  const emailjsTemplateId = process.env.EMAILJS_TEMPLATE_ID;
+  const emailjsPublicKey = process.env.EMAILJS_PUBLIC_KEY;
+  const emailjsPrivateKey = process.env.EMAILJS_PRIVATE_KEY;
   const brevoKey = process.env.BREVO_API_KEY;
   const resendKey = process.env.RESEND_API_KEY;
 
-  if (brevoKey) {
+  if (emailjsServiceId && emailjsTemplateId && emailjsPublicKey) {
+    // Send via EmailJS REST API
+    console.log(`\n===================================`);
+    console.log(`[EMAILJS EMAIL SENDING] To: ${options.email}`);
+    console.log(`Subject: ${options.subject}`);
+    console.log(`===================================\n`);
+
+    return new Promise((resolve, reject) => {
+      const data = JSON.stringify({
+        service_id: emailjsServiceId,
+        template_id: emailjsTemplateId,
+        user_id: emailjsPublicKey,
+        accessToken: emailjsPrivateKey || undefined,
+        template_params: {
+          to_email: options.email,
+          email_subject: options.subject,
+          email_html: options.html
+        }
+      });
+
+      const reqOptions = {
+        hostname: 'api.emailjs.com',
+        port: 443,
+        path: '/api/v1.0/email/send',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(data)
+        }
+      };
+
+      const req = https.request(reqOptions, (res) => {
+        let body = '';
+        res.on('data', (chunk) => body += chunk);
+        res.on('end', () => {
+          if (res.statusCode >= 200 && res.statusCode < 300) {
+            console.log(`[EMAILJS SUCCESS] Sent successfully!`);
+            resolve({ success: true, body });
+          } else {
+            console.error(`[EMAILJS ERROR] Status ${res.statusCode}: ${body}`);
+            reject(new Error(`EmailJS API returned status ${res.statusCode}: ${body}`));
+          }
+        });
+      });
+
+      req.on('error', (err) => {
+        console.error(`[EMAILJS REQUEST ERROR]: ${err.message}`);
+        reject(err);
+      });
+
+      req.write(data);
+      req.end();
+    });
+  } else if (brevoKey) {
     // Send via Brevo HTTP API (Allows sending to ANY email without domain verification)
     console.log(`\n===================================`);
     console.log(`[BREVO EMAIL SENDING] To: ${options.email}`);
