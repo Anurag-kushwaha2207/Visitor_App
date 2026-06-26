@@ -5,41 +5,29 @@ const path = require('path');
 const fs = require('fs');
 const connectDB = require('./config/db');
 
-// Load environment variables
 dotenv.config();
-
-// Connect to MongoDB
 connectDB();
 
 const app = express();
 
-// Enable CORS
 app.use(cors());
-
-// Body Parser Middleware (with 50mb limit for Base64 image uploads)
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-// Serve application routes
-
-// Import Route Files
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
 const appointmentRoutes = require('./routes/appointments');
 const passRoutes = require('./routes/passes');
 
-// Mount Router Links
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/appointments', appointmentRoutes);
 app.use('/api/passes', passRoutes);
 
-// Health check endpoint
 app.get('/api/health', (req, res) => {
   res.status(200).json({ success: true, status: 'Server is healthy' });
 });
 
-// FAQ questions endpoint
 app.get('/api/info/faq', (req, res) => {
   res.status(200).json({
     success: true,
@@ -68,9 +56,8 @@ app.get('/api/info/faq', (req, res) => {
   });
 });
 
-// Centralized error handler
 app.use((err, req, res, next) => {
-  console.error('SERVER ERROR LOG:', err.stack);
+  console.error('Error:', err.stack);
   res.status(err.status || 500).json({
     success: false,
     message: err.message || 'Internal Server Error'
@@ -80,12 +67,10 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 5000;
 
 const server = app.listen(PORT, () => {
-  console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
 
-// Handle unhandled promise rejections
 process.on('unhandledRejection', (err, promise) => {
-  console.log(`Unhandled Promise Rejection Error: ${err.message}`);
-  // Close server & exit process
+  console.log(`Error: ${err.message}`);
   server.close(() => process.exit(1));
 });

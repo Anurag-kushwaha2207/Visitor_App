@@ -1,9 +1,5 @@
 const https = require('https');
 
-/**
- * Sends an email using EmailJS, Brevo, or Resend API.
- * @param {Object} options - Email options (email, subject, html)
- */
 const sendEmail = async (options) => {
   const emailjsServiceId = process.env.EMAILJS_SERVICE_ID;
   const emailjsTemplateId = process.env.EMAILJS_TEMPLATE_ID;
@@ -13,11 +9,7 @@ const sendEmail = async (options) => {
   const resendKey = process.env.RESEND_API_KEY;
 
   if (emailjsServiceId && emailjsTemplateId && emailjsPublicKey) {
-    // Send via EmailJS REST API
-    console.log(`\n===================================`);
-    console.log(`[EMAILJS EMAIL SENDING] To: ${options.email}`);
-    console.log(`Subject: ${options.subject}`);
-    console.log(`===================================\n`);
+    console.log(`Sending EmailJS email to: ${options.email}`);
 
     return new Promise((resolve, reject) => {
       const data = JSON.stringify({
@@ -48,17 +40,17 @@ const sendEmail = async (options) => {
         res.on('data', (chunk) => body += chunk);
         res.on('end', () => {
           if (res.statusCode >= 200 && res.statusCode < 300) {
-            console.log(`[EMAILJS SUCCESS] Sent successfully!`);
+            console.log('EmailJS success');
             resolve({ success: true, body });
           } else {
-            console.error(`[EMAILJS ERROR] Status ${res.statusCode}: ${body}`);
-            reject(new Error(`EmailJS API returned status ${res.statusCode}: ${body}`));
+            console.error(`EmailJS status ${res.statusCode}: ${body}`);
+            reject(new Error(`EmailJS failed: ${body}`));
           }
         });
       });
 
       req.on('error', (err) => {
-        console.error(`[EMAILJS REQUEST ERROR]: ${err.message}`);
+        console.error(`EmailJS error: ${err.message}`);
         reject(err);
       });
 
@@ -66,11 +58,7 @@ const sendEmail = async (options) => {
       req.end();
     });
   } else if (brevoKey) {
-    // Send via Brevo HTTP API (Allows sending to ANY email without domain verification)
-    console.log(`\n===================================`);
-    console.log(`[BREVO EMAIL SENDING] To: ${options.email}`);
-    console.log(`Subject: ${options.subject}`);
-    console.log(`===================================\n`);
+    console.log(`Sending Brevo email to: ${options.email}`);
 
     return new Promise((resolve, reject) => {
       const data = JSON.stringify({
@@ -103,20 +91,20 @@ const sendEmail = async (options) => {
           if (res.statusCode >= 200 && res.statusCode < 300) {
             try {
               const parsed = JSON.parse(body);
-              console.log(`[BREVO SUCCESS] Sent successfully! Message ID: ${parsed.messageId}`);
+              console.log(`Brevo success: ${parsed.messageId}`);
               resolve(parsed);
             } catch (e) {
               resolve({ id: 'success-unknown-body' });
             }
           } else {
-            console.error(`[BREVO ERROR] Status ${res.statusCode}: ${body}`);
-            reject(new Error(`Brevo API returned status ${res.statusCode}: ${body}`));
+            console.error(`Brevo status ${res.statusCode}: ${body}`);
+            reject(new Error(`Brevo failed: ${body}`));
           }
         });
       });
 
       req.on('error', (err) => {
-        console.error(`[BREVO REQUEST ERROR]: ${err.message}`);
+        console.error(`Brevo error: ${err.message}`);
         reject(err);
       });
 
@@ -124,11 +112,7 @@ const sendEmail = async (options) => {
       req.end();
     });
   } else {
-    // Send via Resend HTTP API
-    console.log(`\n===================================`);
-    console.log(`[RESEND EMAIL SENDING] To: ${options.email}`);
-    console.log(`Subject: ${options.subject}`);
-    console.log(`===================================\n`);
+    console.log(`Sending Resend email to: ${options.email}`);
 
     return new Promise((resolve, reject) => {
       const data = JSON.stringify({
@@ -157,20 +141,20 @@ const sendEmail = async (options) => {
           if (res.statusCode >= 200 && res.statusCode < 300) {
             try {
               const parsed = JSON.parse(body);
-              console.log(`[RESEND SUCCESS] Sent successfully! ID: ${parsed.id}`);
+              console.log(`Resend success: ${parsed.id}`);
               resolve(parsed);
             } catch (e) {
               resolve({ id: 'success-unknown-body' });
             }
           } else {
-            console.error(`[RESEND ERROR] Status ${res.statusCode}: ${body}`);
-            reject(new Error(`Resend API returned status ${res.statusCode}: ${body}`));
+            console.error(`Resend status ${res.statusCode}: ${body}`);
+            reject(new Error(`Resend failed: ${body}`));
           }
         });
       });
 
       req.on('error', (err) => {
-        console.error(`[RESEND REQUEST ERROR]: ${err.message}`);
+        console.error(`Resend error: ${err.message}`);
         reject(err);
       });
 
@@ -181,4 +165,3 @@ const sendEmail = async (options) => {
 };
 
 module.exports = sendEmail;
-
