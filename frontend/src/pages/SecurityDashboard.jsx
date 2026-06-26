@@ -105,7 +105,7 @@ const SecurityDashboard = () => {
             { facingMode: "environment" },
             {
               fps: 10,
-              qrbox: { width: 150, height: 150 }
+              qrbox: { width: 180, height: 180 }
             },
             async (decodedText) => {
               // Successfully decoded QR code! Stop camera and verify
@@ -287,7 +287,7 @@ const SecurityDashboard = () => {
                       <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px' }}>
                         
                         {/* QR scan camera frame */}
-                        <div className="qr-frame" style={{ width: '180px', height: '180px', background: '#0a1628', border: '2.5px solid #f43f5e', position: 'relative', overflow: 'hidden' }}>
+                        <div className="qr-frame" style={{ width: '260px', height: '260px', background: '#0a1628', border: '2.5px solid #f43f5e', position: 'relative', borderRadius: '12px', overflow: 'hidden' }}>
                           <div className="qc tl" style={{ borderColor: '#f43f5e' }}></div>
                           <div className="qc tr" style={{ borderColor: '#f43f5e' }}></div>
                           <div className="qc bl" style={{ borderColor: '#f43f5e' }}></div>

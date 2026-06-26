@@ -197,9 +197,9 @@ const VisitorDashboard = () => {
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '20px 0' }}>
                           <div style={{ background: '#fff', padding: '12px', borderRadius: '12px', boxShadow: '0 8px 16px rgba(0,0,0,0.2)', display: 'inline-block' }}>
                             <QRCodeCanvas 
-                              value={pass.qrCodePayload} 
+                              value={pass.passCode} 
                               size={180} 
-                              level="H"
+                              level="M"
                             />
                           </div>
                           <div style={{ fontSize: '10px', color: '#64c8b4', textTransform: 'uppercase', fontWeight: 600, marginTop: '10px', letterSpacing: '1px' }}>

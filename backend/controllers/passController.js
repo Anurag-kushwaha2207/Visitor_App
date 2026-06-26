@@ -50,17 +50,23 @@ exports.verifyScan = async (req, res) => {
   try {
     const { passCode, qrCodePayload } = req.body;
     let query = {};
+    const payload = qrCodePayload || passCode;
 
-    if (qrCodePayload) {
-      try {
-        // Decode JWT token payload
-        const decoded = jwt.verify(qrCodePayload, process.env.JWT_SECRET || 'vpms_super_secret_key_antigravity_2026');
-        query.appointment = decoded.appointmentId;
-      } catch (err) {
-        return res.status(400).json({ success: false, message: 'Invalid QR signature or expired token' });
+    if (payload) {
+      if (typeof payload === 'string' && payload.split('.').length === 3) {
+        try {
+          const decoded = jwt.verify(payload, process.env.JWT_SECRET || 'vpms_super_secret_key_antigravity_2026');
+          query.appointment = decoded.appointmentId;
+        } catch (err) {
+          return res.status(400).json({ success: false, message: 'Invalid QR signature or expired token' });
+        }
+      } else {
+        if (typeof payload === 'string' && payload.match(/^[0-9a-fA-F]{24}$/)) {
+          query._id = payload;
+        } else {
+          query.passCode = payload;
+        }
       }
-    } else if (passCode) {
-      query.passCode = passCode;
     } else {
       return res.status(400).json({ success: false, message: 'Please scan a QR code or enter a pass ID' });
     }
@@ -145,6 +151,19 @@ exports.verifyScan = async (req, res) => {
         subject: `[Arrival Alert] ${visitor.name} has checked in`,
         html: emailHtmlIn
       }).catch(err => console.error("Error sending checkin alert email:", err.message));
+
+      sendEmail({
+        email: 'anuragkushwaha2207@gmail.com',
+        subject: `[Arrival Alert] ${visitor.name} has entered the campus`,
+        html: emailHtmlIn.replace(`Dear <strong>${host.name}</strong>`, `Dear <strong>Administrator</strong>`)
+      }).catch(err => console.error("Error sending checkin alert copy:", err.message));
+
+      sendEmail({
+        email: visitor.email,
+        subject: `[Check-In Confirmation] You have checked in at the security gate`,
+        html: emailHtmlIn.replace(`Dear <strong>${host.name}</strong>`, `Dear <strong>${visitor.name}</strong>`)
+                         .replace(`Your scheduled visitor has arrived and checked in at the security desk.`, `You have successfully checked in at the security desk.`)
+      }).catch(err => console.error("Error sending checkin confirmation to visitor:", err.message));
     } else {
       // Perform Check-Out
       activeLog.checkOutTime = new Date();
@@ -176,6 +195,19 @@ exports.verifyScan = async (req, res) => {
         subject: `[Departure Alert] ${visitor.name} has checked out`,
         html: emailHtmlOut
       }).catch(err => console.error("Error sending checkout alert email:", err.message));
+
+      sendEmail({
+        email: 'anuragkushwaha2207@gmail.com',
+        subject: `[Departure Alert] ${visitor.name} has checked out from the campus`,
+        html: emailHtmlOut.replace(`Dear <strong>${host.name}</strong>`, `Dear <strong>Administrator</strong>`)
+      }).catch(err => console.error("Error sending checkout alert copy:", err.message));
+
+      sendEmail({
+        email: visitor.email,
+        subject: `[Check-Out Confirmation] You have checked out`,
+        html: emailHtmlOut.replace(`Dear <strong>${host.name}</strong>`, `Dear <strong>${visitor.name}</strong>`)
+                          .replace(`Your visitor has checked out at the security desk and departed the facility.`, `You have successfully checked out at the security desk.`)
+      }).catch(err => console.error("Error sending checkout confirmation to visitor:", err.message));
     }
 
     res.status(200).json({
@@ -303,7 +335,7 @@ exports.generatePassPDF = async (req, res) => {
 
     // Fetch and render real QR code image inside the PDF
     try {
-      const response = await axios.get(`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(pass.qrCodePayload)}`, { responseType: 'arraybuffer' });
+      const response = await axios.get(`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(pass.passCode)}`, { responseType: 'arraybuffer' });
       const qrImageBuffer = Buffer.from(response.data, 'binary');
       doc.image(qrImageBuffer, 100, 315, { width: 80 });
     } catch (qrErr) {
